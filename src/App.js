@@ -4,13 +4,13 @@ import {BrowserRouter, Redirect, Route, Switch} from 'react-router-dom'
 import {ThemeProvider} from 'styled-components'
 import './App.css'
 import ScrollToTop from './components/ScrollToTop'
-import appStore from './mobx/app'
+import timerStore from './mobx/app'
 import themeStore from './mobx/theme'
 import Timers from './pages/Timers'
 
 function App() {
   return (
-    <MobxProvider appStore={appStore}>
+    <MobxProvider timerStore={timerStore}>
       <ThemeProvider theme={themeStore}>
         <BrowserRouter>
           <ScrollToTop />

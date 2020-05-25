@@ -11,6 +11,14 @@ class Timer {
   @observable
   name = ''
 
+  @persist
+  @observable
+  active = true
+
+  @persist
+  @observable
+  time = 0
+
   @persist('object')
   @observable
   timeStart
@@ -20,7 +28,7 @@ class Timer {
   timeEnd
 }
 
-class AppStore {
+class TimerStore {
   @observable hydrated = false
 
   @persist('list', Timer)
@@ -28,18 +36,23 @@ class AppStore {
   list = []
 
   @action
-  addMon(id, toggle = false) {
-    this.list.push({id, timeStart: new Date()})
+  addNewTimer(id, toggle = false) {
+    this.list.push({
+      id,
+      active: true,
+      time: 0,
+      timeStart: new Date(),
+    })
   }
 
   @action
-  removeMon(mon) {
+  removeTimer(mon) {
     if (!this.hydrated) return
     this.list = this.list.filter((e) => e.id !== mon.id)
   }
 
   @action
-  updateNickName(mon, name) {
+  updateTimerName(mon, name) {
     if (!this.hydrated) return
     this.list = this.list.map((e) => {
       if (e.id === mon.id) {
@@ -50,8 +63,13 @@ class AppStore {
   }
 
   @action
-  clearParty() {
-    this.list = []
+  updateTimerValue(mon, newData) {
+    this.list = this.list.map((e) => {
+      if (e.id === mon.id) {
+        e = {...e, ...newData}
+      }
+      return e
+    })
   }
 }
 
@@ -61,10 +79,10 @@ const hydrate = create({
 })
 
 // create the state
-const appStore = new AppStore()
+const timerStore = new TimerStore()
 
-hydrate('party', appStore).then(() => {
-  appStore.hydrated = true
+hydrate('timer', timerStore).then(() => {
+  timerStore.hydrated = true
 })
 
-export default appStore
+export default timerStore

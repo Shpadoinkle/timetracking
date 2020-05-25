@@ -1,10 +1,10 @@
-import {observer} from 'mobx-react'
+import {inject, observer} from 'mobx-react'
 import React, {Component} from 'react'
 import styled from 'styled-components'
 import Col from '../components/Col'
 import Padder from '../components/Padder'
 import Timer from '../components/Timer'
-import appStore from '../mobx/app'
+import timerStore from '../mobx/app'
 
 const _Button = styled.div`
   padding: 12px 20px;
@@ -19,6 +19,7 @@ const _Button = styled.div`
   font-weight: 800;
 `
 
+@inject('timerStore')
 @observer
 class Timers extends Component {
   constructor(props) {
@@ -27,10 +28,13 @@ class Timers extends Component {
   }
 
   createTimer = () => {
-    appStore.addMon(appStore.list.length)
+    timerStore.addNewTimer(timerStore.list.length)
   }
 
   render() {
+    if (!timerStore.hydrated) {
+      return null
+    }
     return (
       <Col
         style={{
@@ -42,7 +46,7 @@ class Timers extends Component {
         <Padder h={30} />
         <div>My Timers</div>
         <_Button onClick={this.createTimer}>+ Add Timer</_Button>
-        {appStore.list.map((e) => (
+        {timerStore.list.map((e) => (
           <Timer timer={e} key={e.id} />
         ))}
       </Col>
