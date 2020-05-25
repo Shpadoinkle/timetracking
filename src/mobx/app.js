@@ -7,6 +7,10 @@ class Timer {
   @observable
   id = ''
 
+  @persist
+  @observable
+  name = ''
+
   @persist('object')
   @observable
   timeStart
@@ -39,7 +43,7 @@ class AppStore {
     if (!this.hydrated) return
     this.list = this.list.map((e) => {
       if (e.id === mon.id) {
-        e.nickname = name
+        e.name = name
       }
       return e
     })
