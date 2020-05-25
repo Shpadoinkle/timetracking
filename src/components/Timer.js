@@ -9,7 +9,7 @@ import appStore from '../mobx/app'
 
 const _TimerWrapper = styled.div`
   padding: 20px;
-  margin: 20px;
+  margin: 15px;
   background-color: #fff;
   border-radius: 4px;
   box-shadow: 3px 3px 3px 3px #88888888;
@@ -71,7 +71,9 @@ class Timer extends Component {
             <Row jc="space-between">
               <div className="pointer">Stop</div>
               <Padder h={20} w />
-              <div className="pointer">Delete</div>
+              <div className="pointer" onClick={this.removeTimer}>
+                Delete
+              </div>
             </Row>
           </Col>
         </Row>
