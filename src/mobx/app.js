@@ -1,6 +1,7 @@
 import localForage from 'localforage'
-import {action, observable} from 'mobx'
+import {action, observable, toJS} from 'mobx'
 import {create, persist} from 'mobx-persist'
+import {v4 as uuidv4} from 'uuid'
 
 class Timer {
   @persist
@@ -28,34 +29,47 @@ class Timer {
   timeEnd
 }
 
-class TimerStore {
-  @observable hydrated = false
+class TimerGroup {
+  @persist
+  @observable
+  id = ''
+
+  @persist
+  @observable
+  name = ''
 
   @persist('list', Timer)
   @observable
-  list = []
+  timers = []
+}
+
+class TimerStore {
+  @observable hydrated = false
+
+  @persist('list', TimerGroup)
+  @observable
+  groupList = []
 
   @action
-  addNewTimer(id, toggle = false) {
-    this.list.push({
-      id,
-      active: true,
-      time: 0,
-      timeStart: new Date(),
+  addNewGroup() {
+    this.groupList.push({
+      id: uuidv4(),
+      name: '',
+      timers: [],
     })
   }
 
   @action
-  removeTimer(mon) {
+  removeGroup(id) {
     if (!this.hydrated) return
-    this.list = this.list.filter((e) => e.id !== mon.id)
+    this.groupList = this.groupList.filter((e) => e.id !== id)
   }
 
   @action
-  updateTimerName(mon, name) {
+  updateGroupName(id, name) {
     if (!this.hydrated) return
-    this.list = this.list.map((e) => {
-      if (e.id === mon.id) {
+    this.groupList = this.groupList.map((e) => {
+      if (e.id === id) {
         e.name = name
       }
       return e
@@ -63,10 +77,60 @@ class TimerStore {
   }
 
   @action
-  updateTimerValue(mon, newData) {
-    this.list = this.list.map((e) => {
-      if (e.id === mon.id) {
-        e = {...e, ...newData}
+  addNewTimer(id) {
+    this.groupList = this.groupList.map((e) => {
+      if (e.id === id) {
+        console.log(toJS(e))
+        e.timers.push({
+          id: uuidv4(),
+          name: '',
+          active: true,
+          time: 0,
+          timeStart: new Date(),
+        })
+      }
+      return e
+    })
+  }
+
+  @action
+  removeTimer(id, groupId) {
+    if (!this.hydrated) return
+    this.groupList = this.groupList.map((e) => {
+      if (e.id === groupId) {
+        e.timers = e.timers.filter((t) => t.id !== id)
+      }
+      return e
+    })
+  }
+
+  @action
+  updateTimerName(id, groupId, name) {
+    if (!this.hydrated) return
+    this.groupList = this.groupList.map((e) => {
+      if (e.id === groupId) {
+        e.timers = e.timers.map((t) => {
+          if (t.id === id) {
+            t.name = name
+          }
+          return t
+        })
+      }
+      return e
+    })
+  }
+
+  @action
+  updateTimerValue(id, groupId, newData) {
+    if (!this.hydrated) return
+    this.groupList = this.groupList.map((e) => {
+      if (e.id === groupId) {
+        e.timers = e.timers.map((t) => {
+          if (t.id === id) {
+            t = {...t, ...newData}
+          }
+          return t
+        })
       }
       return e
     })

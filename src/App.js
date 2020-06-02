@@ -1,8 +1,10 @@
 import {Provider as MobxProvider} from 'mobx-react'
 import React from 'react'
-import {BrowserRouter, Redirect, Route, Switch} from 'react-router-dom'
+import {BrowserRouter, Switch} from 'react-router-dom'
 import {ThemeProvider} from 'styled-components'
 import './App.css'
+import Navbar from './components/Navbar'
+import Page from './components/Page'
 import ScrollToTop from './components/ScrollToTop'
 import timerStore from './mobx/app'
 import themeStore from './mobx/theme'
@@ -15,8 +17,10 @@ function App() {
         <BrowserRouter>
           <ScrollToTop />
           <Switch>
-            <Route exact path="/" component={Timers} />
-            <Redirect to="/" />
+            <Page>
+              <Navbar />
+              <Timers />
+            </Page>
           </Switch>
         </BrowserRouter>
       </ThemeProvider>

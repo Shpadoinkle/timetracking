@@ -8,12 +8,11 @@ import Padder from './Padder'
 import Row from './Row'
 
 const _TimerWrapper = styled.div`
-  padding: 20px;
-  margin: 15px;
-  background-color: #fff;
-  border-radius: 4px;
-  box-shadow: 3px 3px 3px 3px #88888888;
-  width: 400px;
+  padding: 30px 0px 20px;
+  border-top: ${({index}) => (index > 0 ? `1px solid #ccc;` : 'none')};
+  border-top: 1px solid #ccc;
+  /* box-shadow: 2px 2px 3px 2px #88888888; */
+  width: 100%;
 `
 
 @observer
@@ -54,9 +53,13 @@ class Timer extends Component {
             time: Date.now() - this.state.start,
           },
           () => {
-            timerStore.updateTimerValue(this.props.timer, {
-              time: this.state.time,
-            })
+            timerStore.updateTimerValue(
+              this.props.timer.id,
+              this.props.groupId,
+              {
+                time: this.state.time,
+              }
+            )
           }
         )
       }, 1000)
@@ -64,16 +67,18 @@ class Timer extends Component {
   }
 
   resumeTimer = () => {
+    const {timer, groupId} = this.props
     this.setState({active: true}, () => {
-      timerStore.updateTimerValue(this.props.timer, {active: true})
+      timerStore.updateTimerValue(timer.id, groupId, {active: true})
       this.startTimer()
     })
   }
 
   stopTimer = () => {
+    const {timer, groupId} = this.props
     clearInterval(this.timer)
     this.setState({active: false}, () => {
-      timerStore.updateTimerValue(this.props.timer, {
+      timerStore.updateTimerValue(timer.id, groupId, {
         time: this.state.time,
         active: false,
       })
@@ -81,23 +86,26 @@ class Timer extends Component {
   }
 
   removeTimer = () => {
-    clearInterval(this.timer)
-    timerStore.removeTimer(this.props.timer)
+    if (confirm('Remove Timer?')) {
+      const {timer, groupId} = this.props
+      clearInterval(this.timer)
+      timerStore.removeTimer(timer.id, groupId)
+    }
   }
 
   render() {
     const {time, start, active} = this.state
-    const {timer} = this.props
+    const {timer, groupId, index} = this.props
     return (
-      <_TimerWrapper>
+      <_TimerWrapper index={index}>
         <Row jc="space-between">
           <Col flex={1}>
             <input
               value={timer.name || ''}
               placeholder="timerName"
-              onChange={(e) =>
-                timerStore.updateTimerName(timer, e.target.value)
-              }
+              onChange={(e) => {
+                timerStore.updateTimerName(timer.id, groupId, e.target.value)
+              }}
             />
           </Col>
           <Col ai="flex-end">

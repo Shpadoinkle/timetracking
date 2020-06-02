@@ -7,6 +7,7 @@ const _Text = styled.div`
   font-style: normal;
   font-weight: ${({bold}) => (bold ? 'bold' : 'normal')};
   font-size: ${({size}) => (size ? `${size}px` : '16px')};
+  color: ${({color}) => (color ? color : '#000')};
   line-height: 100%;
 `
 
